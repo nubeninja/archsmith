@@ -1,8 +1,4 @@
 <p align="center">
-  <img src="docs/images/hero.jpg" alt="archsmith: draw.io AWS architecture diagrams, built from your Terraform. A Claude Code plugin and portable skill." width="720">
-</p>
-
-<p align="center">
   <a href="https://github.com/nubeninja/archsmith/actions/workflows/ci.yml"><img src="https://github.com/nubeninja/archsmith/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <a href="https://github.com/nubeninja/archsmith/actions/workflows/security.yml"><img src="https://github.com/nubeninja/archsmith/actions/workflows/security.yml/badge.svg" alt="Security checks status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache-2.0"></a>
@@ -41,9 +37,12 @@ The setup asks two things: run as an inline **skill** or an isolated **agent**, 
 
 ## How it works
 
-<p align="center">
-  <img src="docs/images/how-it-works.png" alt="Four steps: read your repo, build the diagram, check it, review it in draw.io. The output is one .drawio file in diagram/." width="720">
-</p>
+```mermaid
+flowchart LR
+    A["Your repo<br/>Terraform, CloudFormation,<br/>CDK, Helm, workflows"] --> B["Build<br/>overview tabs and<br/>1920x1080 slide tabs"]
+    B --> C["Check<br/>XML, font size,<br/>labels, overlaps"]
+    C --> D["diagram/*.drawio<br/>open in draw.io"]
+```
 
 1. **Read your repo.** archsmith summarizes your Terraform first, so the model reads less, and then reads the files it needs.
 2. **Build the diagram.** It generates overview tabs with layers and, by default, slide tabs.
@@ -51,10 +50,6 @@ The setup asks two things: run as an inline **skill** or an isolated **agent**, 
 4. **Review in draw.io.** Open the file, adjust it and share it.
 
 ## Run it as a skill or an agent
-
-<p align="center">
-  <img src="docs/images/skill-vs-agent.png" alt="Skill (default): runs inside your chat, cheaper per run, you can steer it, best for small repos, refreshes and slides. Agent: runs in its own context, keeps your chat clean, uses more tokens in total, best for large repos and full rebuilds." width="720">
-</p>
 
 `/archsmith:setup` asks which mode you want and where the diagrams should go. You can also pass the answers directly:
 
