@@ -48,7 +48,7 @@ Use numbered badges (40 px circles) with a short explanation list, and a legend,
 ## 7. Never
 - Never delete a file without asking. Name the file.
 - Never run git add, commit or push.
-- Never use image URLs, clip art or Kubernetes shapes. Official shapes only; never invent a shape name.
+- Never use image URLs, clip art or. Official shapes only; never invent a shape name.
 
 ## 8. Report
 List the tabs and layers, what changed, and what was not checked (for example "not opened in the draw.io app"). Name faded or simplified parts and why. Give the full path of the `.drawio` file and the backup, the validation result, the web preview link when no CLI was available, and a one-line alt text under 100 characters. Offer PNG or JPEG export and ask for the size; do not export unasked.
