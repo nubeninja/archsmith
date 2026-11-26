@@ -1,0 +1,43 @@
+name: CI
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+permissions: {}
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        node: ["20", "22", "24"]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Versions agree across package.json, plugin.json, marketplace.json
+        run: npm run check:versions
+      - name: Installer tests
+        run: npm test
+      - name: Python scripts compile
+        run: python -m compileall -q skills/archsmith/scripts
+      - name: Shell scripts pass shellcheck
+        run: shellcheck skills/archsmith/scripts/*.sh
+      - name: JSON manifests parse
+        run: |
+          for f in package.json .claude-plugin/plugin.json .claude-plugin/marketplace.json; do
+            python -m json.tool "$f" >/dev/null
+          done
+      - name: Package contents (dry run)
+        run: npm pack --dry-run
