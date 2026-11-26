@@ -1,5 +1,9 @@
 <p align="center">
-  <img src="docs/images/hero.jpg" alt="archsmith: draw.io AWS architecture diagrams, built from your Terraform. A Claude Code plugin and portable skill." width="720">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/hero-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/hero-light.svg">
+    <img src="docs/images/hero-light.svg" alt="archsmith: draw.io AWS architecture diagrams, built from your Terraform. A Claude Code plugin and portable skill." width="880">
+  </picture>
 </p>
 
 <p align="center">
@@ -42,7 +46,11 @@ The setup asks two things: run as an inline **skill** or an isolated **agent**, 
 ## How it works
 
 <p align="center">
-  <img src="docs/images/how-it-works.png" alt="Four steps: read your repo, build the diagram, check it, review it in draw.io. The output is one .drawio file in diagram/." width="720">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/how-it-works-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/how-it-works-light.svg">
+    <img src="docs/images/how-it-works-light.svg" alt="Four steps: read your repo, build the diagram, check it, review it in draw.io. The output is one .drawio file in diagram/." width="880">
+  </picture>
 </p>
 
 1. **Read your repo.** archsmith summarizes your Terraform first, so the model reads less, and then reads the files it needs.
@@ -53,7 +61,11 @@ The setup asks two things: run as an inline **skill** or an isolated **agent**, 
 ## Run it as a skill or an agent
 
 <p align="center">
-  <img src="docs/images/skill-vs-agent.png" alt="Skill (default): runs inside your chat, cheaper per run, you can steer it, best for small repos, refreshes and slides. Agent: runs in its own context, keeps your chat clean, uses more tokens in total, best for large repos and full rebuilds." width="720">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/images/skill-vs-agent-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/images/skill-vs-agent-light.svg">
+    <img src="docs/images/skill-vs-agent-light.svg" alt="Skill (default): runs inside your chat, cheaper per run, you can steer it, best for small repos, refreshes and slides. Agent: runs in its own context, keeps your chat clean, uses more tokens in total, best for large repos and full rebuilds." width="880">
+  </picture>
 </p>
 
 `/archsmith:setup` asks which mode you want and where the diagrams should go. You can also pass the answers directly:
