@@ -37,7 +37,7 @@ Then open the repository you want to draw and run:
 /archsmith:diagram
 ```
 
-The result is a `.drawio` file in `diagram/`. Open it in [draw.io](https://www.drawio.com/) to review and edit it.
+The setup asks two things: run as an inline **skill** or an isolated **agent**, and which folder gets the diagrams. Non-interactive form: `/archsmith:setup mode=skill dir=diagram`. It saves `.archsmith.json` in the repo root.
 
 ## How it works
 
@@ -78,74 +78,32 @@ The result is a `.drawio` file in `diagram/`. Open it in [draw.io](https://www.d
 
 You can also ask in plain words, for example: "Use archsmith to draw the architecture of this repository."
 
-## Configuration
-
-archsmith reads `.archsmith.json` from the repository root. The file is plain JSON. Commit it if your team wants shared settings, or add it to `.gitignore` if not.
-
-```json
-{ "mode": "skill", "outputDir": "diagram", "slides": true }
-```
-
-| Key | Default | Meaning |
-| --- | --- | --- |
-| `mode` | `skill` | `skill` runs inline and `agent` runs in its own context. Only the Claude Code commands use this key. |
-| `outputDir` | `diagram` | The folder for new `.drawio` files when you do not give a path |
-| `slides` | `true` | Also build 1920x1080 slide tabs. Use `false` for overview tabs only. |
-
 ## Output
 
 archsmith writes one `.drawio` file to `diagram/` (it creates the folder if needed) or to the path you give. It writes a PNG or JPEG only when you ask for one and give a size, for example "export a PNG that is 1600 px wide". Before it edits an existing file, it saves a backup named `<name>.drawio.bak`.
 
-## Use it in other AI tools
+## Other AI tools (Codex, Cursor, others)
 
-The skill in `skills/archsmith/` is a plain `SKILL.md` with `scripts/` and `references/` folders and no Claude-only settings, so it also works in Codex, Cursor and other tools that support skills. The slash commands and `/archsmith:setup` work only in Claude Code.
-
-Copy the folder into your tool's skills folder by hand, or use the npm installer:
+The skill in `skills/archsmith/` is a plain `SKILL.md` with `scripts/` and `references/`, with no Claude-only settings. Copy it into your tool's skills folder:
 
 ```
-npx archsmith install                      # Claude Code, into ~/.claude/skills (default)
-npx archsmith install codex                # or: claude, cursor, agents
-npx archsmith install cursor --project     # the current repository instead of your home folder
+./install.sh codex      # or: claude, cursor, agents   (add --project for the current repo)
 ```
 
-> The npm package is published with the first tagged release. Until then, use the plugin install above or copy `skills/archsmith/` by hand.
+Or copy `skills/archsmith/` by hand. The scripts need Python 3 only. Slash commands and `/archsmith:setup` are Claude Code only.
 
 The installer never overwrites an existing install unless you add `--force`. It has no dependencies and no install scripts. Releases are published from GitHub Actions with npm provenance, so you can verify a build with `npm audit signatures`.
 
-## Scripts
-
-These scripts live inside the skill:
-
-- `drawio_lib.py` builds pages, layers, groups, icons, edges, badges and a legend, and it rejects duplicate ids.
-- `validate.py` checks a diagram. See the next section.
-- `tf_summary.py` summarizes Terraform (or the output of `terraform show -json`) so the model reads less.
-- `preview_url.py` prints a draw.io web link, so you can open the result without the desktop app.
-- `render.sh` exports PNG, JPEG, SVG or PDF with the draw.io desktop command line.
-
-## Check a diagram yourself
-
-archsmith runs the validator after every build. You can also run it on any `.drawio` file. It needs only Python 3.8 or newer and installs nothing:
-
-```
-python3 skills/archsmith/scripts/validate.py diagram/architecture.drawio
-```
-
-On Windows, use `python` or `py`. If you installed the plugin through Claude Code, the script lives inside the plugin folder. You can also ask archsmith to "validate this diagram" and it will run the script for you.
-
-- **Errors** (exit code 1): invalid XML, compressed pages, duplicate ids, edges that point at nothing, and image URLs.
-- **Warnings** (exit code 0): text under 20 px on slide pages or under 14 px on overview pages, labels longer than about nine words, an overview canvas larger than 3000 px, likely overlapping icons or labels, shape libraries other than AWS and GitHub, and a hardcoded background.
-- `--strict` turns warnings into a failing exit code, which is useful in CI. `--min-font-slide N` and `--min-font-overview N` change the text-size limits.
-
-The overlap check estimates label sizes from the text length, and it does not detect an arrow that crosses a label. Open the file in draw.io before you share it.
+- `drawio_lib.py`: builds pages, layers, groups, icons, edges, badges and a legend, and refuses duplicate ids.
+- `validate.py`: checks XML, ids, edge ends, image URLs and shape libraries.
+- `tf_summary.py`: summarizes Terraform (or `terraform show -json` output) so the model reads less.
+- `preview_url.py`: prints a draw.io web link, so you can open the result with no desktop app.
+- `render.sh`: exports PNG, JPEG, SVG or PDF with the draw.io desktop CLI.
 
 ## Requirements
 
-- Python 3.8 or newer for the scripts (standard library only).
-- Optional: the draw.io desktop command line, for rendering and export.
-  - macOS: install draw.io desktop.
-  - Linux or Windows: download it from the [draw.io desktop releases](https://github.com/jgraph/drawio-desktop/releases) and put `drawio` on your `PATH`. Headless Linux also needs `xvfb-run`.
-  - `render.sh` needs bash. On Windows, use Git Bash or WSL, or call the draw.io command line directly.
-  - Without it, archsmith still writes the file, checks the XML and gives you a web preview link.
+- Python 3 for the scripts.
+- Optional: the draw.io desktop CLI for rendering and export. macOS: install draw.io desktop. Linux or Windows: install from https://github.com/jgraph/drawio-desktop/releases and put `drawio` on PATH; headless Linux needs `xvfb-run`. Without it, archsmith still writes the file, checks the XML, and gives a web preview link.
 - Optional: a draw.io MCP server, so the agent can look up shape names.
 
 ## Limits
@@ -154,10 +112,9 @@ The overlap check estimates label sizes from the text length, and it does not de
 - It draws what the repository defines. It does not read live AWS accounts.
 - A model generates the layout. Open the file in draw.io and review it before you share it.
 
-## Security and releases
+## Credits
 
-Read [SECURITY.md](SECURITY.md) to report a vulnerability. Read [docs/RELEASING.md](docs/RELEASING.md) to see how releases are built and published.
-
+The idea of the codebase-analysis and brainstorm modes, validation, numbered badges with a legend, and a no-install preview link comes from the AWS Labs [aws-architecture-diagram](https://github.com/awslabs/agent-plugins/tree/main/plugins/deploy-on-aws/skills/aws-architecture-diagram) skill (Apache-2.0). archsmith's code and text are written separately and copy none of it.
 
 ## License
 
