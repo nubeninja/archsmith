@@ -9,7 +9,6 @@ concurrency:
   cancel-in-progress: true
 jobs:
   test:
-    name: Tests (Node ${{ matrix.node }})
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

@@ -82,15 +82,17 @@ You can also ask in plain words, for example: "Use archsmith to draw the archite
 
 archsmith writes one `.drawio` file to `diagram/` (it creates the folder if needed) or to the path you give. It writes a PNG or JPEG only when you ask for one and give a size, for example "export a PNG that is 1600 px wide". Before it edits an existing file, it saves a backup named `<name>.drawio.bak`.
 
-## Other AI tools (Codex, Cursor, others)
+## Install with npm (Claude Code, Codex, Cursor, others)
 
-The skill in `skills/archsmith/` is a plain `SKILL.md` with `scripts/` and `references/`, with no Claude-only settings. Copy it into your tool's skills folder:
+The skill in `skills/archsmith/` is a plain `SKILL.md` with `scripts/` and `references/`, with no Claude-only settings. The npm package copies it into your tool's skills folder:
 
 ```
-./install.sh codex      # or: claude, cursor, agents   (add --project for the current repo)
+npx archsmith install              # Claude Code, into ~/.claude/skills (default)
+npx archsmith install codex        # or: claude, cursor, agents
+npx archsmith install cursor --project   # current repo instead of your home folder
 ```
 
-Or copy `skills/archsmith/` by hand. The scripts need Python 3 only. Slash commands and `/archsmith:setup` are Claude Code only.
+It never overwrites an existing install unless you add `--force`. It has no dependencies and no install scripts. Slash commands and `/archsmith:setup` come with the Claude Code plugin only. Releases are published from GitHub Actions with npm provenance, so you can verify the build with `npm audit signatures`.
 
 The installer never overwrites an existing install unless you add `--force`. It has no dependencies and no install scripts. Releases are published from GitHub Actions with npm provenance, so you can verify a build with `npm audit signatures`.
 
@@ -111,6 +113,10 @@ The installer never overwrites an existing install unless you add `--force`. It 
 - archsmith never deletes files without asking, and it never runs `git add`, `git commit` or `git push`.
 - It draws what the repository defines. It does not read live AWS accounts.
 - A model generates the layout. Open the file in draw.io and review it before you share it.
+
+## Security and releases
+
+See [SECURITY.md](SECURITY.md) to report a vulnerability and [docs/RELEASING.md](docs/RELEASING.md) for how releases are built and published.
 
 ## Credits
 
