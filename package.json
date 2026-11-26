@@ -1,0 +1,28 @@
+{
+  "name": "archsmith",
+  "version": "0.2.0",
+  "description": "Claude Code plugin and portable skill that builds draw.io AWS architecture and CI/CD diagrams from your repo's IaC.",
+  "license": "Apache-2.0",
+  "author": { "name": "Parth Mewada", "url": "https://github.com/nubeninja" },
+  "homepage": "https://github.com/nubeninja/archsmith#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/nubeninja/archsmith.git" },
+  "bugs": { "url": "https://github.com/nubeninja/archsmith/issues" },
+  "keywords": ["drawio", "aws", "architecture-diagram", "terraform", "claude-code", "skill", "subagent"],
+  "bin": { "archsmith": "bin/archsmith.js" },
+  "files": [
+    "bin/",
+    ".claude-plugin/",
+    "agents/",
+    "commands/",
+    "skills/",
+    "!**/__pycache__/",
+    "!**/*.pyc"
+  ],
+  "engines": { "node": ">=20" },
+  "publishConfig": { "access": "public", "provenance": true },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "check:versions": "node scripts/check-versions.js",
+    "check": "npm run check:versions && npm test"
+  }
+}

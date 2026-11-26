@@ -1,0 +1,121 @@
+# archsmith
+
+Claude Code plugin and portable skill that builds draw.io AWS architecture and CI/CD diagrams in the official AWS shape style, from your repo's IaC.
+
+It reads Terraform (also CloudFormation, CDK, Helm values and workflow files), then writes a `.drawio` file. Labels come from the repo, not from guesses.
+
+## What it makes
+
+- Overview tabs with layers: network and services, EKS components, traffic flow, connectivity, security.
+- Slide tabs for presenting: 1920x1080, about 12 components, large labels, one topic per tab.
+- Numbered step badges and a legend for diagrams with 7 or more services.
+- Official shapes only (`mxgraph.aws4.*`). No clip art, no image URLs.
+
+## Install in Claude Code
+
+```
+/plugin marketplace add nubeninja/archsmith
+/plugin install archsmith@nubeninja
+```
+
+Then configure it in the repo you want to draw:
+
+```
+/archsmith:setup
+```
+
+The setup asks two things: run as an inline **skill** or an isolated **agent**, and which folder gets the diagrams. Non-interactive form: `/archsmith:setup mode=skill dir=diagram slides=true`. It saves `.archsmith.json` in the repo root.
+
+| Mode | Runs | Pick it for |
+| --- | --- | --- |
+| `skill` (default) | In your chat | Small repos, refreshes, slides. Cheaper, and you can steer it. |
+| `agent` | Its own context | Large repos, full rebuilds. Keeps your chat clean, but uses more tokens in total. |
+
+## Commands
+
+| Command | What it does |
+| --- | --- |
+| `/archsmith:setup` | Choose skill or agent mode and the output folder |
+| `/archsmith:diagram [what to draw]` | Build a new diagram from the repo's IaC |
+| `/archsmith:refresh [file.drawio]` | Update a diagram to match the code, keep hand-made cells |
+| `/archsmith:slides [file.drawio] [topics]` | Add 1920x1080 slide tabs, one topic per tab |
+
+Or ask in plain words: "Use archsmith to draw the architecture of this repo."
+
+## Config file
+
+`.archsmith.json` in the repo root. It is plain JSON and safe to commit if your team wants shared settings, or to ignore if not.
+
+```json
+{ "mode": "skill", "outputDir": "diagram", "slides": true }
+```
+
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `mode` | `skill` | `skill` runs inline, `agent` runs in its own context (Claude Code commands only) |
+| `outputDir` | `diagram` | Where new `.drawio` files go when you give no path |
+| `slides` | `true` | Also build 1920x1080 slide tabs. `false` for overview only |
+
+## Output
+
+A `.drawio` file in `diagram/` (created if missing), or the path you give. No PNG or JPEG unless you ask, with a size, for example `export PNG 1600 px wide`. An existing file is backed up as `<name>.drawio.bak` before edits.
+
+## Install with npm (Claude Code, Codex, Cursor, others)
+
+The skill in `skills/archsmith/` is a plain `SKILL.md` with `scripts/` and `references/`, with no Claude-only settings. The npm package copies it into your tool's skills folder:
+
+```
+npx archsmith install              # Claude Code, into ~/.claude/skills (default)
+npx archsmith install codex        # or: claude, cursor, agents
+npx archsmith install cursor --project   # current repo instead of your home folder
+```
+
+It never overwrites an existing install unless you add `--force`. It has no dependencies and no install scripts. Slash commands and `/archsmith:setup` come with the Claude Code plugin only. Releases are published from GitHub Actions with npm provenance, so you can verify the build with `npm audit signatures`.
+
+## Scripts (inside the skill)
+
+- `drawio_lib.py`: builds pages, layers, groups, icons, edges, badges and a legend, and refuses duplicate ids.
+- `validate.py`: checks the file (details below).
+- `tf_summary.py`: summarizes Terraform (or `terraform show -json` output) so the model reads less.
+- `preview_url.py`: prints a draw.io web link, so you can open the result with no desktop app.
+- `render.sh`: exports PNG, JPEG, SVG or PDF with the draw.io desktop CLI.
+
+## Checking a diagram yourself
+
+archsmith runs the validator for you after every build. You can also run it on any `.drawio` file. It needs only Python 3.8 or newer and installs nothing:
+
+```
+python3 skills/archsmith/scripts/validate.py diagram/architecture.drawio
+```
+
+On Windows use `python` or `py`. If the plugin is installed through Claude Code, the script sits inside the plugin folder; ask archsmith to "validate this diagram" and it runs it for you.
+
+- **Errors** (exit code 1): invalid XML, compressed pages, duplicate ids, edges that point at nothing, image URLs.
+- **Warnings** (exit code 0): text under 20 px on slide pages or under 14 px on overview pages, labels longer than about 9 words, an overview canvas over 3000 px, likely overlapping icons or labels, shape libraries other than AWS and GitHub, a hardcoded background.
+- `--strict` turns warnings into a failing exit code, so you can use it in CI. `--min-font-slide N` and `--min-font-overview N` change the text floors.
+
+Limits: the overlap check estimates label sizes from text length, and it does not check whether an arrow crosses a label. Open the file in draw.io before you share it.
+
+## Requirements
+
+- Python 3.8 or newer for the scripts (standard library only). `render.sh` needs bash: on Windows use Git Bash or WSL, or call the draw.io CLI directly.
+- Optional: the draw.io desktop CLI for rendering and export. macOS: install draw.io desktop. Linux or Windows: install from https://github.com/jgraph/drawio-desktop/releases and put `drawio` on PATH; headless Linux needs `xvfb-run`. Without it, archsmith still writes the file, checks the XML, and gives a web preview link.
+- Optional: a draw.io MCP server, so the agent can look up shape names.
+
+## Limits
+
+- It never deletes files without asking and never runs `git add`, `commit` or `push`.
+- It draws what the repo defines. It does not read live AWS accounts.
+- Diagram layout is generated by a model. Open the file in draw.io and review it before you share it.
+
+## Security and releases
+
+See [SECURITY.md](SECURITY.md) to report a vulnerability and [docs/RELEASING.md](docs/RELEASING.md) for how releases are built and published.
+
+## Credits
+
+The idea of the codebase-analysis and brainstorm modes, validation, numbered badges with a legend, and a no-install preview link comes from the AWS Labs [aws-architecture-diagram](https://github.com/awslabs/agent-plugins/tree/main/plugins/deploy-on-aws/skills/aws-architecture-diagram) skill (Apache-2.0). archsmith's code and text are written separately and copy none of it.
+
+## License
+
+Apache-2.0. See [LICENSE](LICENSE).

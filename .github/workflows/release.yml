@@ -1,0 +1,53 @@
+name: Release
+# Push a tag like v0.2.0 to publish to npm. Needs the "npm" environment (add required reviewers).
+on:
+  push:
+    tags: ["v*.*.*"]
+permissions: {}
+jobs:
+  verify:
+    name: Verify version and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false   # release job publishes: never restore a shared cache (zizmor cache-poisoning)
+      - name: Tag matches every manifest version
+        env:
+          TAG: ${{ github.ref_name }}
+        run: node scripts/check-versions.js "$TAG"
+      - run: npm test
+      - run: npm pack --dry-run
+
+  publish:
+    name: Publish to npm and GitHub release
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: npm
+    permissions:
+      contents: write   # create the GitHub release
+      id-token: write   # npm trusted publishing (OIDC) and provenance
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "24"
+          package-manager-cache: false   # release job publishes: never restore a shared cache (zizmor cache-poisoning)
+          registry-url: https://registry.npmjs.org
+      - name: Publish (OIDC trusted publishing, no stored token)
+        run: npm publish --provenance --access public
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --title "$TAG" --generate-notes --verify-tag
