@@ -1,0 +1,36 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python (skill scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# archsmith test runs inside this repo (not examples/)
+/.archsmith.json
+/diagram/
+*.drawio.bak
+.$*.drawio.bkp
+.$*.drawio.dtmp
+
+# Render and export temp files
+/tmp/
+*.tmp
+
+# Local Claude Code settings
+.claude/settings.local.json
+
+# Secrets
+.env
+.env.*
+*.pem
