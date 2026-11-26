@@ -43,6 +43,8 @@ def _attr(v):
 class Page:
     def __init__(self, name, width, height, layers, index):
         self.name, self.width, self.height, self.index = name, width, height, index
+        # Minimum readable text: 22 px on 1920x1080 slides, 14 px on overview pages.
+        self.base_font = 22 if (width, height) == (1920, 1080) else 14
         self.cells, self.ids = [], set()
         self.layer_ids = []
         for i, lname in enumerate(layers or ["Layer 1"], 1):
@@ -65,12 +67,12 @@ class Page:
         fill_c = "fillColor=#FFFFFF;" if fill else "fillColor=none;"
         style = (f"{'shape=' if shape.startswith('mxgraph') else ''}{shape};{fill_c}"
                  f"strokeColor={stroke};fontColor={stroke};{'dashed=1;' if dashed else ''}"
-                 f"verticalAlign=top;align=left;spacingLeft=30;container=0;{FONT}fontSize=14;")
+                 f"verticalAlign=top;align=left;spacingLeft=30;container=0;{FONT}fontSize={self.base_font};")
         self._add(f'<mxCell id="{cid}" value={_attr(label)} style="{style}" vertex="1" parent="{self._parent(layer)}">'
                   f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>', cid)
 
     def icon(self, cid, label, shape, x, y, size=48, resource=False, label_pos="bottom",
-             faded=False, layer=None, font_size=12):
+             faded=False, layer=None, font_size=None):
         pos = {"bottom": "verticalLabelPosition=bottom;verticalAlign=top;align=center;",
                "right": "labelPosition=right;verticalLabelPosition=middle;align=left;verticalAlign=middle;spacingLeft=6;",
                "left": "labelPosition=left;verticalLabelPosition=middle;align=right;verticalAlign=middle;spacingRight=6;",
@@ -82,18 +84,20 @@ class Page:
                     f"fillColor={ICON_FILL.get(shape, '#232F3D')};strokeColor=#ffffff;")
         else:
             core = f"shape=mxgraph.aws4.{shape};fillColor={ICON_FILL.get(shape, '#232F3D')};"
+        font_size = font_size or self.base_font
         style = f"{core}{pos}{FONT}fontSize={font_size};{'opacity=35;' if faded else ''}"
         self._add(f'<mxCell id="{cid}" value={_attr(label)} style="{style}" vertex="1" parent="{self._parent(layer)}">'
                   f'<mxGeometry x="{x}" y="{y}" width="{size}" height="{size}" as="geometry"/></mxCell>', cid)
 
-    def text(self, cid, label, x, y, w=300, h=40, size=14, bold=False, layer=None):
+    def text(self, cid, label, x, y, w=300, h=40, size=None, bold=False, layer=None):
+        size = size or self.base_font
         style = f"text;html=0;align=left;verticalAlign=middle;{FONT}fontSize={size};{'fontStyle=1;' if bold else ''}"
         self._add(f'<mxCell id="{cid}" value={_attr(label)} style="{style}" vertex="1" parent="{self._parent(layer)}">'
                   f'<mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry"/></mxCell>', cid)
 
     def badge(self, cid, number, x, y, size=40, layer=None):
         style = (f"ellipse;fillColor=#007CBD;strokeColor=none;fontColor=#FFFFFF;fontStyle=1;"
-                 f"{FONT}fontSize=16;aspect=fixed;")
+                 f"{FONT}fontSize={max(16, self.base_font)};aspect=fixed;")
         self._add(f'<mxCell id="{cid}" value="{number}" style="{style}" vertex="1" parent="{self._parent(layer)}">'
                   f'<mxGeometry x="{x}" y="{y}" width="{size}" height="{size}" as="geometry"/></mxCell>', cid)
 
@@ -103,7 +107,7 @@ class Page:
             raise ValueError(f"edge {cid}: source or target not defined yet ({source} -> {target})")
         style = (f"edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;endFill=0;"
                  f"strokeWidth={width};strokeColor={EDGE_COLOURS[kind]};{'dashed=1;' if dashed else ''}"
-                 f"{FONT}fontSize=12;")
+                 f"{FONT}fontSize={self.base_font};")
         pts = ""
         if points:
             pts = '<Array as="points">' + "".join(f'<mxPoint x="{px}" y="{py}"/>' for px, py in points) + "</Array>"
@@ -114,7 +118,7 @@ class Page:
     def legend(self, x, y, layer=None, prefix="legend"):
         """Small legend for the three arrow colours."""
         rows = [("public", "Public traffic"), ("private", "Private traffic"), ("neutral", "Other / optional (dashed)")]
-        self.text(f"{prefix}-title", "Legend", x, y, 200, 30, 16, True, layer)
+        self.text(f"{prefix}-title", "Legend", x, y, 260, 30, self.base_font + 2, True, layer)
         for i, (kind, label) in enumerate(rows):
             yy = y + 40 + i * 40
             a, b = f"{prefix}-a{i}", f"{prefix}-b{i}"
@@ -123,7 +127,7 @@ class Page:
                           f'parent="{self._parent(layer)}"><mxGeometry x="{xx}" y="{yy}" width="2" height="2" '
                           f'as="geometry"/></mxCell>', cid)
             self.edge(f"{prefix}-e{i}", a, b, kind, dashed=(kind == "neutral"), width=3, layer=layer)
-            self.text(f"{prefix}-t{i}", label, x + 80, yy - 14, 260, 28, 12, False, layer)
+            self.text(f"{prefix}-t{i}", label, x + 80, yy - 14, 360, 28, self.base_font, False, layer)
 
     def xml(self):
         body = "\n        ".join(self.cells)
