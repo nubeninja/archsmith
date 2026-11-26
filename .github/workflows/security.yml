@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   codeql:
+    name: CodeQL (${{ matrix.language }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -33,6 +34,7 @@ jobs:
           category: /language:${{ matrix.language }}
 
   trivy:
+    name: Trivy (vulnerabilities and misconfig)
     # Vulnerabilities, committed secrets and misconfigurations. Fails on HIGH/CRITICAL.
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -59,6 +61,7 @@ jobs:
           category: trivy
 
   gitleaks:
+    name: Gitleaks (secret scan)
     # Scans full history with the gitleaks CLI (the Action needs a paid license on orgs).
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -80,6 +83,7 @@ jobs:
           ./gitleaks git --redact --exit-code 1 .
 
   zizmor:
+    name: Zizmor (workflow lint)
     # Static analysis of the workflows themselves (injection, unpinned actions, excess permissions).
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -93,6 +97,7 @@ jobs:
       - uses: zizmorcore/zizmor-action@1b4550e929643b8b26a62303c6bd64814271a4f1 # v0.9.2
 
   dependency-review:
+    name: Dependency review (PRs only)
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5

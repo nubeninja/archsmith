@@ -6,6 +6,7 @@ on:
 permissions: {}
 jobs:
   verify:
+    name: Verify version and tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -25,6 +26,7 @@ jobs:
       - run: npm pack --dry-run
 
   publish:
+    name: Publish to npm and GitHub release
     needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
