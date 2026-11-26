@@ -8,3 +8,9 @@
   network (one region, 3 AZs), EKS components, security, CI/CD application,
   CI/CD infrastructure.
 - Every cell id is unique within its page, layer ids included (a clash breaks export).
+
+## Readability floors (validate.py warns below these)
+- Slide pages (1920x1080): text 22 px or more, titles 28 to 36 px, icons 64 px or more.
+- Overview pages: text 14 px or more, canvas at most 3000 px per side. Split into more tabs instead of growing the canvas.
+- Icon labels: at most 2 short lines (about 9 words). Put longer explanations in a separate numbered list.
+- Slides are part of the default output. Skip them only when `.archsmith.json` has `"slides": false` or the user asks for overview only.
