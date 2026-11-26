@@ -148,10 +148,6 @@ Limits: the overlap check estimates label sizes from text length, and it does no
 
 See [SECURITY.md](SECURITY.md) to report a vulnerability and [docs/RELEASING.md](docs/RELEASING.md) for how releases are built and published.
 
-## Credits
-
-The idea of the codebase-analysis and brainstorm modes, validation, numbered badges with a legend, and a no-install preview link comes from the AWS Labs [aws-architecture-diagram](https://github.com/awslabs/agent-plugins/tree/main/plugins/deploy-on-aws/skills/aws-architecture-diagram) skill (Apache-2.0). archsmith's code and text are written separately and copy none of it.
-
 ## License
 
 Apache-2.0. See [LICENSE](LICENSE).
