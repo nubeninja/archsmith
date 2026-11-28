@@ -3,6 +3,7 @@ import contextlib
 import io
 import json
 import os
+import shutil
 import sys
 import tempfile
 import unittest
@@ -147,8 +148,17 @@ class LibCase(unittest.TestCase):
 
 
 class TfSummaryCase(unittest.TestCase):
+    def setUp(self):
+        # The fixtures are stored as .txt so security scanners do not treat them as real
+        # infrastructure. Copy them to a temp folder under their real .tf names.
+        self.tmp = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmp, True)
+        os.makedirs(os.path.join(self.tmp, ".terraform"))
+        shutil.copyfile(os.path.join(FIXTURES, "tf", "main.tf.txt"), os.path.join(self.tmp, "main.tf"))
+        shutil.copyfile(os.path.join(FIXTURES, "tf", "skipped.tf.txt"), os.path.join(self.tmp, ".terraform", "ignored.tf"))
+
     def test_scan_dirs(self):
-        res, mods, cidrs, az_files = tf_summary.scan_dirs([os.path.join(FIXTURES, "tf")])
+        res, mods, cidrs, az_files = tf_summary.scan_dirs([self.tmp])
         self.assertEqual(sorted(res), ["aws_eks_cluster", "aws_subnet", "aws_vpc"])
         self.assertEqual(len(res["aws_subnet"]), 2)
         self.assertEqual(mods, [("vpc", "terraform-aws-modules/vpc/aws")])
