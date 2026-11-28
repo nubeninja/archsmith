@@ -1,0 +1,12 @@
+{
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {"address": "aws_vpc.main", "type": "aws_vpc"}
+      ],
+      "child_modules": [
+        {"resources": [{"address": "module.app.aws_lambda_function.fn", "type": "aws_lambda_function"}]}
+      ]
+    }
+  }
+}

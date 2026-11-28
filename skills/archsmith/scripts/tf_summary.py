@@ -25,7 +25,8 @@ def scan_dirs(dirs):
                 if not f.endswith(".tf"):
                     continue
                 p = os.path.join(root, f)
-                t = open(p, encoding="utf-8", errors="ignore").read()
+                with open(p, encoding="utf-8", errors="ignore") as fh:
+                    t = fh.read()
                 for rtype, rname in RES.findall(t):
                     res[rtype].append(f"{rname} ({os.path.relpath(p, top)})")
                 mods += [(n, s) for n, s in MOD.findall(t)]
@@ -36,7 +37,8 @@ def scan_dirs(dirs):
 
 
 def scan_plan(path):
-    plan = json.load(open(path))
+    with open(path, encoding="utf-8") as fh:
+        plan = json.load(fh)
     res = collections.defaultdict(list)
 
     def walk(m):

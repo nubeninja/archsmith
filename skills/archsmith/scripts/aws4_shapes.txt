@@ -1,0 +1,42 @@
+# Shape names archsmith has used and checked in draw.io (the part after mxgraph.aws4.).
+# validate.py warns about any other aws4 name. To use a new shape, check the name with the
+# draw.io MCP search_shapes tool or in draw.io, then add one line here.
+# resourceIcon wrapper
+resourceIcon
+# resourceIcon names
+route_53
+api_gateway
+waf
+eks
+aurora
+ecr
+secrets_manager
+identity_and_access_management
+cloudwatch_2
+key_management_service
+auto_scaling2
+cloud_map
+vpc_privatelink
+ec2
+client
+# plain shapes
+application_load_balancer
+nat_gateway
+endpoints
+elastic_network_interface
+aurora_instance
+bucket
+certificate_manager
+container_1
+container_2
+container_3
+internet_alt2
+authenticated_user
+# groups
+group_aws_cloud_alt
+group_region
+group_vpc2
+group_availability_zone
+group_security_group
+group_auto_scaling_group
+group_ec2_instance_contents
