@@ -7,7 +7,7 @@
   "homepage": "https://github.com/nubeninja/archsmith#readme",
   "repository": { "type": "git", "url": "git+https://github.com/nubeninja/archsmith.git" },
   "bugs": { "url": "https://github.com/nubeninja/archsmith/issues" },
-  "keywords": ["drawio", "aws", "architecture-diagram", "terraform", "claude-code", "skill", "subagent"],
+  "keywords": ["drawio", "aws", "architecture-diagram", "terraform", "claude-code", "skill"],
   "bin": { "archsmith": "bin/archsmith.js" },
   "files": [
     "bin/",

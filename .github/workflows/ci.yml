@@ -33,6 +33,8 @@ jobs:
         run: npm test
       - name: Python scripts compile
         run: python -m compileall -q skills/archsmith/scripts
+      - name: Python script tests
+        run: python -W error -m unittest discover -s test/python -v
       - name: Shell scripts pass shellcheck
         run: shellcheck skills/archsmith/scripts/*.sh
       - name: JSON manifests parse

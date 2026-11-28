@@ -77,7 +77,7 @@ The setup asks two things: run as an inline **skill** or an isolated **agent**, 
 | Mode | Runs | Best for |
 | --- | --- | --- |
 | `skill` (default) | In your chat | Small repositories, refreshes and slides. It is cheaper, and you can steer it. |
-| `agent` | In its own context | Large repositories and full rebuilds. It keeps your chat clean but uses more tokens in total. |
+| `agent` (experimental) | In its own context | Large repositories and full rebuilds. It keeps your chat clean but uses more tokens in total. Not fully tested yet, so skill mode is the supported path for now. |
 
 ## Commands
 
@@ -120,7 +120,9 @@ npx archsmith install cursor --project   # current repo instead of your home fol
 
 It never overwrites an existing install unless you add `--force`. It has no dependencies and no install scripts. Slash commands and `/archsmith:setup` come with the Claude Code plugin only. Releases are published from GitHub Actions with npm provenance, so you can verify the build with `npm audit signatures`.
 
-The installer never overwrites an existing install unless you add `--force`. It has no dependencies and no install scripts. Releases are published from GitHub Actions with npm provenance, so you can verify a build with `npm audit signatures`.
+## Skill scripts
+
+The skill ships these scripts. They use only the Python standard library.
 
 - `drawio_lib.py`: builds pages, layers, groups, icons, edges, badges and a legend, and refuses duplicate ids.
 - `validate.py`: checks the file (details below).

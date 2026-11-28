@@ -8,11 +8,11 @@ ERRORS (exit code 1): XML does not parse, compressed or empty pages, duplicate c
 missing parents, edges pointing at cells that do not exist, image URLs or data URIs in styles.
 WARNINGS (exit code 0, or 1 with --strict): text too small to read on a projector, labels that
 are too long, overview canvas too big to view, overlapping icons or labels, other shape
-libraries, hardcoded background.
+libraries, aws4 shape names that are not in aws4_shapes.txt, hardcoded background.
 The overlap check is an estimate (label sizes are guessed from text length). It does not check
 whether an arrow crosses a label. Always open the file in draw.io before sharing it.
 """
-import math
+import os
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -20,6 +20,17 @@ import xml.etree.ElementTree as ET
 BAD_URL = re.compile(r"image=(https?:|data:)", re.I)
 DEFAULT_FONT = 12  # draw.io default when a style has no fontSize
 MAX_SHOWN = 12
+AWS4_NAME = re.compile(r"(?:shape|resIcon)=mxgraph\.aws4\.([A-Za-z0-9_]+)")
+
+
+def load_allowlist():
+    """Shape names from aws4_shapes.txt next to this script. Empty set if the file is missing."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "aws4_shapes.txt")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return {l.strip() for l in f if l.strip() and not l.startswith("#")}
+    except OSError:
+        return set()
 
 
 def num(v, d=0.0):
@@ -106,7 +117,9 @@ def hit(a, b, tol=4.0):
 
 def check(path, strict=False, min_slide=20, min_overview=14):
     errors, warnings = [], []
-    raw = open(path, encoding="utf-8").read()
+    allowed = load_allowlist()
+    with open(path, encoding="utf-8") as f:
+        raw = f.read()
     for m in re.finditer(r"<!--(.*?)-->", raw, re.S):
         if "--" in m.group(1):
             errors.append("double hyphen inside an XML comment")
@@ -151,6 +164,11 @@ def check(path, strict=False, min_slide=20, min_overview=14):
             for m in re.finditer(r"mxgraph\.([a-z0-9_]+)\.", style):
                 if m.group(1) not in ("aws4", "weblogos"):
                     warnings.append("[%s] %s: shape library %s is not aws4 or weblogos" % (name, cid, m.group(1)))
+            if allowed:
+                for m in AWS4_NAME.finditer(style):
+                    if m.group(1) not in allowed:
+                        warnings.append("[%s] %s: shape aws4.%s is not in aws4_shapes.txt (check the name, then add it)" % (
+                            name, cid, m.group(1)))
             text = plain(c.get("value"))
             if text and c.get("vertex") == "1":
                 fs = font_of(style)

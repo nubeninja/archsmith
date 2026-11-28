@@ -1,7 +1,7 @@
 {
   "name": "archsmith",
   "version": "0.2.0",
-  "description": "Subagent that reads your Terraform, Helm values and workflows, then builds draw.io diagrams with official AWS shapes. Overview tabs with layers, plus slide tabs for presenting.",
+  "description": "Skill that reads your Terraform, Helm values and workflows, then builds draw.io diagrams with official AWS shapes. Overview tabs with layers, plus slide tabs for presenting.",
   "author": {
     "name": "Parth Mewada",
     "url": "https://github.com/nubeninja"
@@ -14,6 +14,6 @@
     "aws",
     "architecture-diagram",
     "terraform",
-    "subagent"
+    "skill"
   ]
 }
